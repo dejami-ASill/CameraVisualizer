@@ -11,7 +11,7 @@ import com.devsil.cameravisualizer.CameraActivity;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by devsi on 10/28/2017.
+ * Created by devsil on 10/28/2017.
  */
 
 public class CameraActivityHandler extends Handler {

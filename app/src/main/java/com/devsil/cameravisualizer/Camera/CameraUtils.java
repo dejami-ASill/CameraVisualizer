@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * Created by devsi on 10/28/2017.
+ * Created by devsil on 10/28/2017.
  */
 
 public class CameraUtils {

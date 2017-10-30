@@ -1,7 +1,7 @@
 package com.devsil.cameravisualizer.Imaging.GLTools;
 
 /**
- * Created by devsi on 10/28/2017.
+ * Created by devsil on 10/28/2017.
  */
 
 /**

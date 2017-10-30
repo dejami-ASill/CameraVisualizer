@@ -20,7 +20,7 @@ import com.devsil.cameravisualizer.Camera.Interfaces.ICameraActivity;
 import com.devsil.cameravisualizer.Camera.Threads.CameraThread;
 
 /**
- * Created by devsi on 10/28/2017.
+ * Created by devsil on 10/28/2017.
  */
 
 public class CameraActivity extends AppCompatActivity implements ICameraActivity, SurfaceTexture.OnFrameAvailableListener{

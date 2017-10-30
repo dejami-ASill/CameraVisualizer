@@ -5,7 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
 /**
- * Created by devsi on 10/28/2017.
+ * Created by devsil on 10/28/2017.
  */
 
 public class CameraSurfaceView extends GLSurfaceView {
