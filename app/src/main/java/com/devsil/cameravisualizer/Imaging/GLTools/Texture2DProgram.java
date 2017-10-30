@@ -109,8 +109,6 @@ public class Texture2DProgram {
                     "}" +
 
                     "void main() {" +
-
-
                     "    vec4 frag = texture2D(sTexture, vTextureCoord) * 1.435;" +
                     "    gl_FragColor = Contrast(frag.xyz, 0.65);" + // 0.475
                     "}";
@@ -165,11 +163,14 @@ public class Texture2DProgram {
     private float mColorAdjust;
 
 
+//    private final Line mLine;
+
     /**
      * Prepares the program in the current EGL context.
      */
     public Texture2DProgram(ProgramType programType) {
         mProgramType = programType;
+//        mLine = new Line();
 
         switch (programType) {
             case TEXTURE_2D:
@@ -383,5 +384,6 @@ public class Texture2DProgram {
         GLES20.glDisableVertexAttribArray(maTextureCoordLoc);
         GLES20.glBindTexture(mTextureTarget, 0);
         GLES20.glUseProgram(0);
+
     }
 }

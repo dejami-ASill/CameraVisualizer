@@ -16,6 +16,7 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.devsil.cameravisualizer.Audio.AudioSampler;
 import com.devsil.cameravisualizer.Camera.CameraSurfaceRenderer;
 import com.devsil.cameravisualizer.Camera.CameraSurfaceView;
 import com.devsil.cameravisualizer.Camera.CameraUtils;
@@ -32,10 +33,12 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
     private final int REQUEST_CODE_CAMERA = 40001;
 
+    private final int REQUEST_CODE_AUDIO = 50001;
+
+
     private FrameLayout flMain;
 
     private CameraSurfaceView mCameraSurface;
-//    private CameraActivityHandler mHandler;
 
     private TextView mEffectText;
 
@@ -44,6 +47,8 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
     protected CameraThread.CameraThreadHandler mCameraHandler;
 
     protected CameraSurfaceRenderer mRenderer;
+
+    private AudioSampler mAudioSampler;
 
     @Override
     public void onResume(){
@@ -66,6 +71,26 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
             // We have permission to use the camera! Whoooo!
             startCameraThread();
         }
+
+
+        // CHECK PERMISSIONS
+        if(checkSelfPermission(Manifest.permission.RECORD_AUDIO ) != PackageManager.PERMISSION_GRANTED){
+            // We evidently don't have permissions. So lets determine in what way we ask the user.
+
+            // Should we show the user the rationale for this? Maybe because they denied it before but is needed.
+            if(shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)){
+                // TODO ALERT DIALOG HERE or something.
+
+            } else{
+                // Make the request for the permissions
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_CODE_CAMERA);
+            }
+        }
+        else {
+            // We have permission to use the camera! Whoooo!
+//            startAudioRecording();
+        }
+
 
         mCameraSurface.onResume();
 
@@ -97,6 +122,8 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
             if (mActivityHandler != null) {
                 mActivityHandler.invalidateHandler();
             }
+
+            mAudioSampler.stopRecording();
         }
 
 
@@ -147,6 +174,13 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
 
         mCameraHandler = mCameraThread.mCameraHandler;
+    }
+
+
+
+    private void startAudioRecording(){
+        mAudioSampler = new AudioSampler();
+        mAudioSampler.startRecording();
     }
 
 
@@ -261,6 +295,13 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
                     Snackbar.make(flMain, R.string.camera_permissions_required, Snackbar.LENGTH_SHORT);
                 }
                 break;
+            case REQUEST_CODE_AUDIO:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+//                    startAudioRecording();
+                }
+                else{
+                    Snackbar.make(flMain, R.string.camera_permissions_required, Snackbar.LENGTH_SHORT);
+                }
         }
     }
 

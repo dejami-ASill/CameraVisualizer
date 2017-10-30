@@ -6,6 +6,8 @@
 
     <string name="camera_permissions_required">Please Accept the Camera Permissions.</string>
 
+    <string name="audio_permission_required">Audio Permission denied, not capturing audio</string>
+
     <string name="camera_failed">Camera Failed.</string>
 
     <string name="camera_effect_normal">None</string>

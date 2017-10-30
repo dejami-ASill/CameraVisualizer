@@ -73,5 +73,6 @@ public class FullFrameRect {
                 mRectDrawable.getVertexStride(),
                 texMatrix, mRectDrawable.getTexCoordArray(), textureId,
                 mRectDrawable.getTexCoordStride());
+
     }
 }

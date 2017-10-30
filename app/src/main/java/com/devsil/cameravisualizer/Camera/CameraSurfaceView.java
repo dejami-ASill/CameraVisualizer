@@ -19,6 +19,5 @@ public class CameraSurfaceView extends GLSurfaceView {
     public CameraSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setEGLContextClientVersion(2);
-//        setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 }
