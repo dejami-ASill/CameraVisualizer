@@ -4,7 +4,10 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 /**
  * Created by devsil on 10/28/2017.
@@ -144,6 +147,7 @@ public class Texture2DProgram {
                     "    gl_FragColor = sum;\n" +
                     "}\n";
 
+
     private ProgramType mProgramType;
 
     // Handles to the GL program and various components of it.
@@ -163,14 +167,12 @@ public class Texture2DProgram {
     private float mColorAdjust;
 
 
-//    private final Line mLine;
 
     /**
      * Prepares the program in the current EGL context.
      */
     public Texture2DProgram(ProgramType programType) {
         mProgramType = programType;
-//        mLine = new Line();
 
         switch (programType) {
             case TEXTURE_2D:
@@ -332,6 +334,7 @@ public class Texture2DProgram {
     public void draw(float[] mvpMatrix, FloatBuffer vertexBuffer, int firstVertex,
                      int vertexCount, int coordsPerVertex, int vertexStride,
                      float[] texMatrix, FloatBuffer texBuffer, int textureId, int texStride) {
+
         GLUtil.checkGlError("draw start");
 
         // Select the program.
@@ -386,4 +389,5 @@ public class Texture2DProgram {
         GLES20.glUseProgram(0);
 
     }
+
 }

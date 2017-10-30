@@ -31,6 +31,7 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
 
     private FullFrameRect mFullScreen;
 
+
     private final float[] mSTMatrix = new float[16];
     private int mTextureId;
 
@@ -119,6 +120,7 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             mFullScreen.release(false);     // assume the GLSurfaceView EGL context is about
             mFullScreen = null;             //  to be destroyed
         }
+
         mIncomingWidth = mIncomingHeight = -1;
     }
 
@@ -229,7 +231,7 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
         mIncomingSizeUpdated = true;
     }
 
-    public SurfaceTexture getmSurfaceTexture(){
+    public SurfaceTexture getSurfaceTexture(){
         return mSurfaceTexture;
     }
 
@@ -252,7 +254,10 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
         mFullScreen = new FullFrameRect(
                 new Texture2DProgram(Texture2DProgram.ProgramType.TEXTURE_EXT));
 
+
         mTextureId = mFullScreen.createTextureObject();
+
+
 
         // Create a SurfaceTexture, with an external texture, in this EGL context.  We don't
         // have a Looper in this thread -- GLSurfaceView doesn't create one -- so the frame
@@ -268,6 +273,7 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         // All we are doing here is adjusting the view port width and height;
         gl10.glViewport(0,0,width,height);
+
 
         // Now we send a comment back to the UI thread to let the camera know of the needed changes.
         mCameraHandler.sendMessage(mCameraHandler.obtainMessage(
@@ -348,7 +354,6 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             if(VERBOSE) {
                 Log.i(TAG, "Drawing before incoming texture size set; skipping");
             }
-//            return;
         }
         // Update the filter, if necessary.
         if (mCurrentFilter != mNewFilter) {
@@ -367,6 +372,7 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             mFullScreen.drawFrame(mTextureId, mSTMatrix);
         }
 
+        /// End Frame Rendering ///
     }
 
 

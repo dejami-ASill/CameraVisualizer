@@ -1,5 +1,7 @@
 package com.devsil.cameravisualizer.Imaging.GLTools;
 
+import android.opengl.GLU;
+
 import java.nio.FloatBuffer;
 
 /**
@@ -46,10 +48,13 @@ public class Drawable2d {
             0.0f, 0.0f,     // 2 top left
             1.0f, 0.0f      // 3 top right
     };
+
+
     private static final FloatBuffer RECTANGLE_BUF =
             GLUtil.createFloatBuffer(RECTANGLE_COORDS);
     private static final FloatBuffer RECTANGLE_TEX_BUF =
             GLUtil.createFloatBuffer(RECTANGLE_TEX_COORDS);
+
 
     /**
      * A "full" square, extending from -1 to +1 in both dimensions.  When the model/view/projection
@@ -74,7 +79,6 @@ public class Drawable2d {
             GLUtil.createFloatBuffer(FULL_RECTANGLE_COORDS);
     private static final FloatBuffer FULL_RECTANGLE_TEX_BUF =
             GLUtil.createFloatBuffer(FULL_RECTANGLE_TEX_COORDS);
-
 
     private FloatBuffer mVertexArray;
     private FloatBuffer mTexCoordArray;

@@ -37,6 +37,7 @@ public class FullFrameRect {
             }
             mProgram = null;
         }
+
     }
 
     /**
@@ -62,6 +63,7 @@ public class FullFrameRect {
     public int createTextureObject() {
         return mProgram.createTextureObject();
     }
+
 
     /**
      * Draws a viewport-filling rect, texturing it with the specified texture object.

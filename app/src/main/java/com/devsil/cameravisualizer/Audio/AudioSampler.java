@@ -13,7 +13,7 @@ import java.util.TimerTask;
  * Created by devsil on 10/30/2017.
  */
 
-public class AudioSampler {
+public class AudioSampler implements Runnable{
 
     private static final String TAG = ".Debug.AudioSampler";
 
@@ -24,14 +24,30 @@ public class AudioSampler {
 
     private int mSamplingInterval = 100;
 
-    private Visualizer mVisualizer;
-
     private boolean mRecording = false;
 
-    private Timer mTimer;
+    private Timer mTimer; // Temporary - Easy to implement and test this without messing with the calling classes much.
 
-    public AudioSampler(){
+    int numberOfBytesRead;
+
+    private final AudioCalculator mAudioCalculator;
+    private final AudioCallback mCallback;
+
+
+    /**
+     *
+     * This Class will be used to list to the microphone on the device. This will eventually feed
+     * audio data to the Renderer to draw geometric shapes, patterns and distortions onto the Surface ontop of the
+     * live camera preview;
+     *
+     *
+     **
+     * @param callback - call back to calling thread
+     */
+    public AudioSampler(AudioCallback callback){
         init();
+        mAudioCalculator = new AudioCalculator();
+        this.mCallback = callback;
     }
 
     private void init(){
@@ -44,8 +60,6 @@ public class AudioSampler {
         if (mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
             mBufferSize = bs;
         }
-
-
     }
 
 
@@ -54,51 +68,42 @@ public class AudioSampler {
 
         mAudioRecord.startRecording();
 
-        Log.d(TAG, "AudioRecorder ID: "+ mAudioRecord.getAudioSessionId());
-
-
-        mVisualizer = new Visualizer(mAudioRecord.getAudioSource());
-        mVisualizer.setMeasurementMode(Visualizer.MEASUREMENT_MODE_PEAK_RMS);
-
-        mVisualizer.setDataCaptureListener(VISUALIZER_LISTENER,SAMPLING_RATE, true, true);
-        mVisualizer.setEnabled(true);
         mRecording = true;
         runRecording();
     }
 
     public void stopRecording(){
+        mTimer.cancel();
         mAudioRecord.stop();
         mAudioRecord.release();
 
         mRecording = false;
 
-        mVisualizer.setEnabled(false);
-        mVisualizer.release();
     }
 
 
-    private void runRecording(){
+    private void runRecording() {
         final byte buffer[] = new byte[mBufferSize];
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                mAudioRecord.read(buffer, 0, mBufferSize);
+                if (!mRecording) {
+                    return;
+                }
+                numberOfBytesRead = mAudioRecord.read(buffer, 0, mBufferSize);
+
+                mAudioCalculator.setBytes(buffer);
+                int amplitude = mAudioCalculator.getAmplitude();
+                double decibelLevel = mAudioCalculator.getDecibel();
+                double frequency = mAudioCalculator.getFrequency();
+
+//                Log.d(TAG, "Calculated Audio Results: Amplitude: " + amplitude + " Decibels: " + decibelLevel + " Frequency: " + frequency);
             }
-        },0,mSamplingInterval);
+        }, 0, mSamplingInterval);
     }
 
-
-    private Visualizer.OnDataCaptureListener VISUALIZER_LISTENER = new Visualizer.OnDataCaptureListener() {
-        @Override
-        public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int i) {
-            Log.d(TAG, "On Wave Form Data Capture : " + bytes.length  + " : " + i);
-        }
-
-        @Override
-        public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int i) {
-            Log.d(TAG, "On Fft Data Capture : " + bytes.length  + " : " + i);
-        }
-    };
-
-
+    @Override
+    public void run() {
+        /// IMPLEMENT ALL THIS IN A BACKGROUND THREAD SO AS TO NOT TYE UP THE UI THREAD WITH THESE SHANNANIGANS
+    }
 }

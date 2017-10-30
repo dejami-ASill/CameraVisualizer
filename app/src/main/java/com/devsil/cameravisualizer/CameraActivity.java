@@ -16,6 +16,7 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.devsil.cameravisualizer.Audio.AudioCallback;
 import com.devsil.cameravisualizer.Audio.AudioSampler;
 import com.devsil.cameravisualizer.Camera.CameraSurfaceRenderer;
 import com.devsil.cameravisualizer.Camera.CameraSurfaceView;
@@ -28,7 +29,7 @@ import com.devsil.cameravisualizer.Camera.Threads.CameraThread;
  * Created by devsil on 10/28/2017.
  */
 
-public class CameraActivity extends AppCompatActivity implements ICameraActivity, SurfaceTexture.OnFrameAvailableListener{
+public class CameraActivity extends AppCompatActivity implements ICameraActivity, SurfaceTexture.OnFrameAvailableListener, AudioCallback{
     private static final String TAG = ".Debug.CameraActivity";
 
     private final int REQUEST_CODE_CAMERA = 40001;
@@ -83,12 +84,12 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
             } else{
                 // Make the request for the permissions
-                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_CODE_CAMERA);
+                requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_CODE_AUDIO);
             }
         }
         else {
             // We have permission to use the camera! Whoooo!
-//            startAudioRecording();
+            startAudioRecording();
         }
 
 
@@ -100,8 +101,6 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
     @Override
     public void onPause(){
         super.onPause();
-
-        Log.d(TAG, "on Create");
 
         releaseCamera();
 
@@ -179,7 +178,7 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
 
     private void startAudioRecording(){
-        mAudioSampler = new AudioSampler();
+        mAudioSampler = new AudioSampler(this);
         mAudioSampler.startRecording();
     }
 
@@ -297,7 +296,7 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
                 break;
             case REQUEST_CODE_AUDIO:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//                    startAudioRecording();
+                    startAudioRecording();
                 }
                 else{
                     Snackbar.make(flMain, R.string.camera_permissions_required, Snackbar.LENGTH_SHORT);
@@ -464,5 +463,10 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
             mCameraHandler.handleMessage(mCameraHandler.obtainMessage(CameraThread.HANDLE_ZOOM, (int) newDistance, (int) mDistance));
             mDistance = newDistance;
         }
+    }
+
+    @Override
+    public void onAudioSampled(int amp, double db, double freq) {
+//        Log.d(TAG, "Calculated Audio Results: Amplitude: " + amp + " Decibels: " + db + " Frequency: " + freq);
     }
 }
