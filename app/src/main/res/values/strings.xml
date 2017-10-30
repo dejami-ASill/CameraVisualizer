@@ -8,6 +8,15 @@
 
     <string name="camera_failed">Camera Failed.</string>
 
+    <string name="camera_effect_normal">None</string>
+    <string name="camera_effect_sharpen">Sharpen</string>
+    <string name="camera_effect_blur">Blur</string>
+    <string name="camera_effect_bw">Black &amp; White</string>
+    <string name="camera_effect_edge_detection">Edge Detection</string>
+    <string name="camera_effect_emboss">Embossed</string>
+    <string name="camera_effect_something_weird">Something Strange</string>
+    <string name="camera_effect_something_stranger">Something Stranger</string>
+
 
 
 </resources>

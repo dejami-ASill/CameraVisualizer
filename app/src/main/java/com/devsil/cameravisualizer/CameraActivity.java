@@ -10,7 +10,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.devsil.cameravisualizer.Camera.CameraSurfaceRenderer;
 import com.devsil.cameravisualizer.Camera.CameraSurfaceView;
@@ -31,7 +35,9 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
     private FrameLayout flMain;
 
     private CameraSurfaceView mCameraSurface;
-    private CameraActivityHandler mHandler;
+//    private CameraActivityHandler mHandler;
+
+    private TextView mEffectText;
 
     protected CameraActivityHandler mActivityHandler;
     private CameraThread mCameraThread;
@@ -111,6 +117,9 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
         flMain = (FrameLayout) findViewById(R.id.main_frame);
 
         mCameraSurface = (CameraSurfaceView)findViewById(R.id.camera_surface_view);
+
+
+        mEffectText = (TextView) findViewById(R.id.effect_textview);
 
         mCameraSurface.setRenderer(mRenderer);
     }
@@ -286,11 +295,11 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
             case MotionEvent.ACTION_UP:
                 mCurrentTouch = motionEvent.getX();
                 float delta = mCurrentTouch - mFirstTouch;
-                if(Math.abs(delta) > SWIPE_THRESHOLD){
-                    // This will be a left to right kind of swipe
+                if(( mCurrentTouch < mFirstTouch ) && Math.abs(delta) > SWIPE_THRESHOLD){
+                    // This will be a right to left kind of swipe
                     incrementEffect();
                 }
-                else {
+                else if((mCurrentTouch > mFirstTouch) && Math.abs(delta) > SWIPE_THRESHOLD){
                     decrementEffect();
                 }
         }
@@ -324,6 +333,80 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
                 mRenderer.changeFilterMode(mCurrentEffect);
             }
         });
+
+        showLabel();
+    }
+
+    private void showLabel(){
+        String which = null;
+        switch (mCurrentEffect){
+            case CameraUtils.FILTER_NONE:
+                which = getString(R.string.camera_effect_normal);
+                break;
+            case CameraUtils.FILTER_BLACK_WHITE:
+                which = getString(R.string.camera_effect_bw);
+                break;
+            case CameraUtils.FILTER_BLUR:
+                which = getString(R.string.camera_effect_blur);
+                break;
+            case CameraUtils.FILTER_EDGE_DETECT:
+                which = getString(R.string.camera_effect_edge_detection);
+                break;
+            case CameraUtils.FILTER_EMBOSS:
+                which = getString(R.string.camera_effect_emboss);
+                break;
+            case CameraUtils.FILTER_SEPIA:
+                which = getString(R.string.camera_effect_emboss);
+                break;
+            case CameraUtils.FILTER_SOMETHING:
+                which = getString(R.string.camera_effect_something_weird);
+                break;
+            case CameraUtils.FILTER_SOMETHING_2:
+                which = getString(R.string.camera_effect_something_stranger);
+                break;
+            default:
+                Log.e(TAG, "Unknown filter");
+        }
+
+        mEffectText.setText(which);
+
+
+        final Animation in = new AlphaAnimation(0.0f, 1.0f);
+        in.setDuration(1000);
+
+        final Animation out = new AlphaAnimation(1.0f, 0.0f);
+        out.setDuration(1000);
+
+        in.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mEffectText.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mEffectText.startAnimation(out);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        out.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mEffectText.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        mEffectText.startAnimation(in);
+
     }
 
 
