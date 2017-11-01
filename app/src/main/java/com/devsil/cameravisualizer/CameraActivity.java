@@ -51,6 +51,10 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
     private AudioSampler mAudioSampler;
 
+    private TextView mRectEffectBtn;
+    private TextView mTriangleEffectBtn;
+    private TextView mNoEffectBtn;
+
     @Override
     public void onResume(){
         super.onResume();
@@ -141,6 +145,15 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
         setContentView(R.layout.activity_camera);
 
         flMain = (FrameLayout) findViewById(R.id.main_frame);
+
+
+        mRectEffectBtn = (TextView)findViewById(R.id.effect_rect);
+        mTriangleEffectBtn = (TextView)findViewById(R.id.effect_triangle);
+        mNoEffectBtn = (TextView)findViewById(R.id.effect_none);
+
+        mRectEffectBtn.setOnClickListener(EFFECT_CLICK);
+        mTriangleEffectBtn.setOnClickListener(EFFECT_CLICK);
+        mNoEffectBtn.setOnClickListener(EFFECT_CLICK);
 
         mCameraSurface = (CameraSurfaceView)findViewById(R.id.camera_surface_view);
 
@@ -467,6 +480,24 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
     @Override
     public void onAudioSampled(int amp, double db, double freq) {
-//        Log.d(TAG, "Calculated Audio Results: Amplitude: " + amp + " Decibels: " + db + " Frequency: " + freq);
+        mRenderer.setSoundData(amp, db, freq);
     }
+
+
+    private View.OnClickListener EFFECT_CLICK = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.effect_rect:
+                    mRenderer.setEffect(CameraSurfaceRenderer.MODE.RECT);
+                    break;
+                case R.id.effect_none:
+                    mRenderer.setEffect(CameraSurfaceRenderer.MODE.NONE);
+                    break;
+                case R.id.effect_triangle:
+                    mRenderer.setEffect(CameraSurfaceRenderer.MODE.TRIANGLE);
+                    break;
+            }
+        }
+    };
 }

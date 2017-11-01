@@ -297,7 +297,6 @@ public class Texture2DProgram {
         }
         System.arraycopy(values, 0, mKernel, 0, KERNEL_SIZE);
         mColorAdjust = colorAdj;
-        //Log.d(TAG, "filt kernel: " + Arrays.toString(mKernel) + ", adj=" + colorAdj);
     }
 
     /**
@@ -313,7 +312,6 @@ public class Texture2DProgram {
                 -rw, 0f,    0f, 0f,     rw, 0f,
                 -rw, rh,    0f, rh,     rw, rh
         };
-        //Log.d(TAG, "filt size: " + width + "x" + height + ": " + Arrays.toString(mTexOffset));
     }
 
     /**
@@ -337,13 +335,15 @@ public class Texture2DProgram {
 
         GLUtil.checkGlError("draw start");
 
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        GLES20.glDepthMask(false);
+
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
+
         // Select the program.
         GLES20.glUseProgram(mProgramHandle);
         GLUtil.checkGlError("glUseProgram");
 
-        // Set the texture.
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(mTextureTarget, textureId);
 
         // Copy the model / view / projection matrix over.
         GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, 0);
@@ -385,8 +385,9 @@ public class Texture2DProgram {
         // Done -- disable vertex array, texture, and program.
         GLES20.glDisableVertexAttribArray(maPositionLoc);
         GLES20.glDisableVertexAttribArray(maTextureCoordLoc);
+
+        // Restore the depth state for further drawing.
         GLES20.glBindTexture(mTextureTarget, 0);
-        GLES20.glUseProgram(0);
 
     }
 

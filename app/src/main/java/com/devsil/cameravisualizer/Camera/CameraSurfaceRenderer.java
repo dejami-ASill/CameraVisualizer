@@ -2,13 +2,17 @@ package com.devsil.cameravisualizer.Camera;
 
 import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.Log;
 
 import com.devsil.cameravisualizer.Camera.Handlers.CameraActivityHandler;
 import com.devsil.cameravisualizer.Imaging.GLTools.FullFrameRect;
+import com.devsil.cameravisualizer.Imaging.GLTools.Line;
+import com.devsil.cameravisualizer.Imaging.GLTools.Rectangle;
 import com.devsil.cameravisualizer.Imaging.GLTools.Texture2DProgram;
+import com.devsil.cameravisualizer.Imaging.GLTools.Triangle;
 
 import java.io.File;
 
@@ -16,6 +20,10 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
+
+    public enum MODE {
+        NONE, RECT, TRIANGLE // MORE COMING SOON
+    }
 
     private static final String TAG = ".Debug.GLRenderer";
 
@@ -30,7 +38,6 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     private File mOutputFile;
 
     private FullFrameRect mFullScreen;
-
 
     private final float[] mSTMatrix = new float[16];
     private int mTextureId;
@@ -54,6 +61,13 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     private int mNewFilter;
 
     private final boolean mSupportsVideo;
+
+    // Shape Declarations
+    private Line mLine;
+    private Triangle mTriangle;
+    private Rectangle mRect;
+
+    private MODE mWhichMode = MODE.NONE;
 
     // TODO ADD IN Video Stuff
 //    private VideoMuxer mMuxer;
@@ -231,8 +245,24 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
         mIncomingSizeUpdated = true;
     }
 
+    public void setEffect(MODE effect){
+        this.mWhichMode = effect;
+    }
+
     public SurfaceTexture getSurfaceTexture(){
         return mSurfaceTexture;
+    }
+
+    public void setSoundData(int amp, double db, double freq){
+//        Log.d(TAG, "Calculated Audio Results: Amplitude: " + amp + " Decibels: " + db + " Frequency: " + freq);
+
+        if(mRect != null && mWhichMode == MODE.RECT){
+            mRect.setColor(amp, db, freq);
+        }
+        else if(mTriangle != null && mWhichMode== MODE.TRIANGLE){
+            mTriangle.setTriangleColor(amp, db, freq);
+        }
+
     }
 
 
@@ -249,15 +279,25 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             mRecordingStatus = RECORDING_OFF;
         }
 
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+
+        // Enable alpha blending to allow the alpha to be rendered correctly.
+        GLES20.glEnable(GLES20.GL_BLEND);
+        // Allows the alpha bit in the "Overlay" bitmap to be multplied by the background images creating the transparent (window) effect.
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
         // Set up the texture blitter that will be used for on-screen display.  This
         // is *not* applied to the recording, because that uses a separate shader.
         mFullScreen = new FullFrameRect(
                 new Texture2DProgram(Texture2DProgram.ProgramType.TEXTURE_EXT));
 
+        mLine = new Line();
+
+        mTriangle = new Triangle();
+
+        mRect = new Rectangle();
 
         mTextureId = mFullScreen.createTextureObject();
-
-
 
         // Create a SurfaceTexture, with an external texture, in this EGL context.  We don't
         // have a Looper in this thread -- GLSurfaceView doesn't create one -- so the frame
@@ -273,7 +313,15 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         // All we are doing here is adjusting the view port width and height;
         gl10.glViewport(0,0,width,height);
+        GLES20.glViewport(0,0, width, height);
 
+        if(mTriangle != null){
+            mTriangle.defineProjections(width, height);
+        }
+
+        if(mRect != null){
+            mRect.defineProjections(width, height);
+        }
 
         // Now we send a comment back to the UI thread to let the camera know of the needed changes.
         mCameraHandler.sendMessage(mCameraHandler.obtainMessage(
@@ -369,7 +417,20 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             mSurfaceTexture.getTransformMatrix(mSTMatrix);
         }
         if(mFullScreen != null){
-            mFullScreen.drawFrame(mTextureId, mSTMatrix);
+                mFullScreen.drawFrame(mTextureId, mSTMatrix);
+        }
+
+
+        switch (mWhichMode){
+            case RECT:
+                mRect.draw();
+                break;
+            case TRIANGLE:
+                mTriangle.draw();
+                break;
+            case NONE:
+            default:
+                // DO NOTHING HERE WE DONT HAVE TO DRAW ANYTHING EXTRA
         }
 
         /// End Frame Rendering ///

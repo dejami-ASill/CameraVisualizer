@@ -21,4 +21,9 @@
 
 
 
+    <string name="crazy_rect">Rectangle</string>
+    <string name="no_eq">None</string>
+    <string name="crazy_triangle">Triangle</string>
+
+
 </resources>

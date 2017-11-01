@@ -97,7 +97,8 @@ public class AudioSampler implements Runnable{
                 double decibelLevel = mAudioCalculator.getDecibel();
                 double frequency = mAudioCalculator.getFrequency();
 
-//                Log.d(TAG, "Calculated Audio Results: Amplitude: " + amplitude + " Decibels: " + decibelLevel + " Frequency: " + frequency);
+                mCallback.onAudioSampled(amplitude, decibelLevel, frequency);
+
             }
         }, 0, mSamplingInterval);
     }
