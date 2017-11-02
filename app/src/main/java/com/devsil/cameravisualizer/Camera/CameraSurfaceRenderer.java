@@ -8,6 +8,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.devsil.cameravisualizer.Camera.Handlers.CameraActivityHandler;
+import com.devsil.cameravisualizer.Imaging.GLTools.Cube;
 import com.devsil.cameravisualizer.Imaging.GLTools.FullFrameRect;
 import com.devsil.cameravisualizer.Imaging.GLTools.Line;
 import com.devsil.cameravisualizer.Imaging.GLTools.Rectangle;
@@ -15,6 +16,7 @@ import com.devsil.cameravisualizer.Imaging.GLTools.Texture2DProgram;
 import com.devsil.cameravisualizer.Imaging.GLTools.Triangle;
 
 import java.io.File;
+import java.util.Locale;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -22,7 +24,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
 
     public enum MODE {
-        NONE, RECT, TRIANGLE // MORE COMING SOON
+        NONE, RECT, TRIANGLE, CUBE // MORE COMING SOON
     }
 
     private static final String TAG = ".Debug.GLRenderer";
@@ -67,7 +69,14 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     private Triangle mTriangle;
     private Rectangle mRect;
 
+    private Cube mCube;
+
     private MODE mWhichMode = MODE.NONE;
+
+
+    private int maxAmplitude = 22000;// DEFAULT MAX
+    private float maxDb = -0.01f;
+    private float maxFreq = 30000f;
 
     // TODO ADD IN Video Stuff
 //    private VideoMuxer mMuxer;
@@ -254,13 +263,19 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
     }
 
     public void setSoundData(int amp, double db, double freq){
-//        Log.d(TAG, "Calculated Audio Results: Amplitude: " + amp + " Decibels: " + db + " Frequency: " + freq);
+        float amplitude = ((float)amp/22000f);
+        float decibels = ((float)db/50f) +0.5f;
+        float frequency = ((float)freq*0.0003f) ;
+//        Log.d(TAG, String.format(Locale.US, "After Normalization  Amp: %.2f, Db: %.2f, Freq: %.2f", amplitude, decibels, frequency));
 
-        if(mRect != null && mWhichMode == MODE.RECT){
-            mRect.setColor(amp, db, freq);
+        if(mRect != null && mWhichMode == MODE.RECT ){
+            mRect.setColor(amplitude, decibels, frequency);
         }
         else if(mTriangle != null && mWhichMode== MODE.TRIANGLE){
-            mTriangle.setTriangleColor(amp, db, freq);
+            mTriangle.setTriangleColor(amplitude, decibels, frequency > 1.0f ? 1 : frequency);
+        }
+        else if(mCube != null && mWhichMode == MODE.CUBE){
+            mCube.setColor(amplitude, decibels,frequency);
         }
 
     }
@@ -297,6 +312,8 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
 
         mRect = new Rectangle();
 
+        mCube = new Cube();
+
         mTextureId = mFullScreen.createTextureObject();
 
         // Create a SurfaceTexture, with an external texture, in this EGL context.  We don't
@@ -321,6 +338,10 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
 
         if(mRect != null){
             mRect.defineProjections(width, height);
+        }
+
+        if(mCube != null){
+            mCube.defineProjections(width, height);
         }
 
         // Now we send a comment back to the UI thread to let the camera know of the needed changes.
@@ -428,10 +449,14 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             case TRIANGLE:
                 mTriangle.draw();
                 break;
+            case CUBE:
+                mCube.draw();
+                break;
             case NONE:
             default:
                 // DO NOTHING HERE WE DONT HAVE TO DRAW ANYTHING EXTRA
         }
+
 
         /// End Frame Rendering ///
     }

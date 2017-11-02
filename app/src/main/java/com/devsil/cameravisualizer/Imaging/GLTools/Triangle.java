@@ -99,10 +99,10 @@ public class Triangle {
 
     }
 
-    public void setTriangleColor(int amp, double db, double freq){
-        color[0] = amp/10000f;
-        color[1] = (float)db/100f;
-        color[2] = (float)freq/5000f;
+    public void setTriangleColor(float amp,float db, float freq){
+        color[0] = amp;
+        color[1] = db;
+        color[2] = freq;
     }
 
 

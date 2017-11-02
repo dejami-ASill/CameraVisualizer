@@ -53,7 +53,7 @@ public class Rectangle {
 
     private short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
 
-    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 0.3f };
+    float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 0.2f };
 
 
     private int mProgramHandle;
@@ -104,10 +104,10 @@ public class Rectangle {
     }
 
 
-    public void setColor(int amp, double db, double freq){
-        color[0] = amp/10000f;
-        color[1] = -(float)db/100f;
-        color[2] = (float)freq/5000f;
+    public void setColor(float amp, float db,float freq){
+        color[0] = amp;
+        color[1] = db;
+        color[2] = freq;
     }
 
 
