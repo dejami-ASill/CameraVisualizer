@@ -456,8 +456,6 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
             default:
                 // DO NOTHING HERE WE DONT HAVE TO DRAW ANYTHING EXTRA
         }
-
-
         /// End Frame Rendering ///
     }
 
