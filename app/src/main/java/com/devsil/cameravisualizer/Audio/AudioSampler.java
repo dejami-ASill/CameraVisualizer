@@ -22,7 +22,7 @@ public class AudioSampler implements Runnable{
     private AudioRecord mAudioRecord;
     private int mBufferSize;
 
-    private int mSamplingInterval = 100;
+    private int mSamplingInterval = 50;
 
     private boolean mRecording = false;
 
@@ -32,6 +32,7 @@ public class AudioSampler implements Runnable{
 
     private final AudioCalculator mAudioCalculator;
     private final AudioCallback mCallback;
+
 
 
     /**
@@ -107,4 +108,5 @@ public class AudioSampler implements Runnable{
     public void run() {
         /// IMPLEMENT ALL THIS IN A BACKGROUND THREAD SO AS TO NOT TYE UP THE UI THREAD WITH THESE SHANNANIGANS
     }
+
 }

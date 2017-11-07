@@ -264,9 +264,9 @@ public class CameraSurfaceRenderer implements GLSurfaceView.Renderer{
 
     public void setSoundData(int amp, double db, double freq){
         float amplitude = ((float)amp/22000f);
-        float decibels = ((float)db/50f) +0.5f;
+        float decibels = -((float)db/50f);
         float frequency = ((float)freq*0.0003f) ;
-//        Log.d(TAG, String.format(Locale.US, "After Normalization  Amp: %.2f, Db: %.2f, Freq: %.2f", amplitude, decibels, frequency));
+        Log.d(TAG, String.format(Locale.US, "After Normalization  Amp: %.2f, Db: %.2f, Freq: %.2f", amplitude, decibels, frequency));
 
         if(mRect != null && mWhichMode == MODE.RECT ){
             mRect.setColor(amplitude, decibels, frequency);

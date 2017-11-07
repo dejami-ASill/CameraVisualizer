@@ -1,6 +1,9 @@
 package com.devsil.cameravisualizer;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
@@ -15,6 +18,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.devsil.cameravisualizer.Audio.AudioCallback;
@@ -30,7 +34,7 @@ import com.devsil.cameravisualizer.Camera.Threads.CameraThread;
  * Created by devsil on 10/28/2017.
  */
 
-public class CameraActivity extends AppCompatActivity implements ICameraActivity, SurfaceTexture.OnFrameAvailableListener, AudioCallback{
+public class CameraActivity extends AppCompatActivity implements ICameraActivity, SurfaceTexture.OnFrameAvailableListener, AudioCallback, OptionsFragment.OptionsMenuListener{
     private static final String TAG = ".Debug.CameraActivity";
 
     private final int REQUEST_CODE_CAMERA = 40001;
@@ -52,9 +56,11 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
     private AudioSampler mAudioSampler;
 
-    private TextView mRectEffectBtn;
-    private TextView mTriangleEffectBtn;
-    private TextView mNoEffectBtn;
+    private FrameLayout mFragContainer;
+
+    private Fragment mOptionsFragment;
+
+    private ImageView mOptionsBtn;
 
     @Override
     public void onResume(){
@@ -99,6 +105,7 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
 
         mCameraSurface.onResume();
+
 
     }
 
@@ -147,22 +154,38 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
 
         flMain = (FrameLayout) findViewById(R.id.main_frame);
 
-
-        mRectEffectBtn = (TextView)findViewById(R.id.effect_rect);
-        mTriangleEffectBtn = (TextView)findViewById(R.id.effect_triangle);
-        mNoEffectBtn = (TextView)findViewById(R.id.effect_none);
-
-        mRectEffectBtn.setOnClickListener(EFFECT_CLICK);
-        mTriangleEffectBtn.setOnClickListener(EFFECT_CLICK);
-        mNoEffectBtn.setOnClickListener(EFFECT_CLICK);
-
         mCameraSurface = (CameraSurfaceView)findViewById(R.id.camera_surface_view);
 
 
         mEffectText = (TextView) findViewById(R.id.effect_textview);
 
         mCameraSurface.setRenderer(mRenderer);
+
+        mFragContainer = (FrameLayout)findViewById(R.id.fragment_container);
+
+        mOptionsBtn = (ImageView)findViewById(R.id.settings_btn);
+        mOptionsBtn.setOnClickListener(OPTIONS_CLICK);
+
+        mOptionsFragment = new OptionsFragment();
     }
+
+
+    private View.OnClickListener OPTIONS_CLICK = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            if(!mOptionsFragment.isAdded()) {
+                fragmentTransaction.add(mFragContainer.getId(), mOptionsFragment);
+            }
+            else{
+                fragmentTransaction.remove(mOptionsFragment);
+            }
+
+            fragmentTransaction.commit();
+        }
+    };
 
     private void releaseCamera(){
         if(mCameraHandler != null ){
@@ -170,6 +193,7 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
             mCameraHandler.sendMessage(mCameraHandler.obtainMessage(CameraThread.MSG_RELEASE_CAMERA));
         }
     }
+
 
 
     private void startCameraThread(){
@@ -517,5 +541,10 @@ public class CameraActivity extends AppCompatActivity implements ICameraActivity
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
+    }
+
+    @Override
+    public void onShapeSelected(CameraSurfaceRenderer.MODE mode) {
+        mRenderer.setEffect(mode);
     }
 }
